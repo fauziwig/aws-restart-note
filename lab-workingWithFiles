@@ -1,0 +1,212 @@
+Working with Files
+ 
+
+Note
+
+All labs rely on previous courseware and lab information.
+
+ 
+
+Objectives
+In this lab, you will:
+
+Create a backup file of an entire folder structure using tar
+
+Log the creation of the backup in a file with the date, time, and file name of the backup file
+
+Transfer the backup file to another folder
+
+Task 1: Use SSH to connect to an Amazon Linux EC2 instance
+In this task, you will connect to a Amazon Linux EC2 instance. You will use an SSH utility to perform all of these operations. The following instructions vary slightly depending on whether you are using Windows or Mac/Linux.
+
+ Windows Users: Using SSH to Connect
+ These instructions are specifically for Windows users. If you are using macOS or Linux, skip to the next section.
+
+Select the Details drop-down menu above these instructions you are currently reading, and then select Show. A Credentials window will be presented.
+
+Select the Download PPK button and save the labsuser.ppk file.
+Typically your browser will save it to the Downloads directory.
+
+Make a note of the PublicIP address.
+
+Then exit the Details panel by selecting the X.
+
+Download  PuTTY to SSH into the Amazon EC2 instance. If you do not have PuTTY installed on your computer, download it here.
+
+Open putty.exe
+
+Configure your PuTTY session by following the directions in the following link: Connect to your Linux instance using PuTTY
+
+Windows Users: Select here to skip ahead to the next task.
+
+
+ 
+
+macOS  and Linux  Users
+These instructions are specifically for Mac/Linux users. If you are a Windows user, skip ahead to the next task.
+
+Select the Details drop-down menu above these instructions you are currently reading, and then select Show. A Credentials window will be presented.
+
+Select the Download PEM button and save the labsuser.pem file.
+
+Make a note of the PublicIP address.
+
+Then exit the Details panel by selecting the X.
+
+Open a terminal window, and change directory cd to the directory where the labsuser.pem file was downloaded. For example, if the labuser.pem file was saved to your Downloads directory, run this command:
+
+cd ~/Downloads
+Change the permissions on the key to be read-only, by running this command:
+
+chmod 400 labsuser.pem
+Run the below command (replace <public-ip> with the PublicIP address you copied earlier).
+Alternatively, return to the EC2 Console and select Instances. Check the box next to the instance you want to connect to and in the Description tab copy the IPv4 Public IP value.:
+
+ssh -i labsuser.pem ec2-user@<public-ip>
+Type yes when prompted to allow the first connection to this remote SSH server.
+Because you are using a key pair for authentication, you will not be prompted for a password.
+
+
+Task 2: Create a backup
+In this task, you create a backup of an entire file structure. 
+
+Your work environment has the following folder structure:
+
+/home/ec2-user/CompanyA/
+/home/ec2-user/CompanyA/Employees/
+/home/ec2-user/CompanyA/Employees/Schedules.csv
+/home/ec2-user/CompanyA/Finance/
+/home/ec2-user/CompanyA/Finance/Salary.csv
+/home/ec2-user/CompanyA/HR/
+/home/ec2-user/CompanyA/HR/Assessments.csvv
+/home/ec2-user/CompanyA/HR/Managers.csv
+/home/ec2-user/CompanyA/IA/
+/home/ec2-user/CompanyA/Management/
+/home/ec2-user/CompanyA/Management/Promotions.csv
+/home/ec2-user/CompanyA/Management/Sections.csv
+/home/ec2-user/CompanyA/SharedFolders.csv
+
+You use tar to create a backup.
+
+To ensure that you are in the /home/ec2-user/ folder, enter the following command into the terminal and press Enter.
+
+pwd
+Expected output:
+
+[ec2-user@ ~]$ pwd
+/home/ec2-user
+To validate that the CompanyA folder exists, enter the following command into the terminal and press Enter.
+
+ls -R CompanyA
+Expected output:
+
+[ec2-user@ ~]$ ls /home/ec2-user/CompanyA
+CompanyA/:
+Employees  Finance  HR  IA  Management  SharedFolders
+
+CompanyA/Employees:
+Schedules.csv
+
+CompanyA/Finance:
+Salary.csv
+
+CompanyA/HR:
+Assessments.csv  Managers.csv
+
+CompanyA/IA:
+
+CompanyA/Management:
+Promotions.csv  Sections.csv
+To back up the entire CompanyA folder structure recursively, enter the following command and press Enter.
+
+tar -csvpzf backup.CompanyA.tar.gz CompanyA  
+Expected output:
+
+CompanyA/
+CompanyA/Management/
+CompanyA/Management/Sections.csv
+CompanyA/Management/Promotions.csv
+CompanyA/Employees/
+CompanyA/Employees/Schedules.csv
+CompanyA/Finance/
+CompanyA/Finance/Salary.csv
+CompanyA/HR/
+CompanyA/HR/Managers.csv
+CompanyA/HR/Assessments.csv
+CompanyA/IA/
+CompanyA/SharedFolders/
+
+[ec2-user@ ~]$ ls                                     
+backup.CompanyA.tar.gz  CompanyA  
+To verify that the archive was created, enter the following command and press Enter.
+
+ls  
+Expected output:
+
+[ec2-user@ ~]$ CompanyA backup.CompanyA.tar.gz  
+The backup.CompanyA.tar.gz folder contains all the folders and files in the CompanyA folder. You can copy it and unzip it to get the entire structure on another location or host.
+
+ 
+
+Task 3: Log the backup
+In this task, you create a file for logging the date, time, and file name of the backup tar file that you created. This file indicates when you created backups and could be useful to avoid creating unnecessary backups in the future.
+
+To navigate to the CompanyA folder, enter the following command into the terminal and press Enter.
+
+cd /home/ec2-user/CompanyA
+Expected output:
+
+ec2-user@ ~]$ cd /home/ec2-user/CompanyA
+[ec2-user@ CompanyA]$
+To create an empty backup file named backups.csv, enter the following command and press Enter.
+
+touch SharedFolders/backups.csv
+To add the date, time, and file name to the backups.csv file, enter the following command and press Enter.
+
+echo "25 Aug 25 2021, 16:59, backup.CompanyA.tar.gz" | sudo tee SharedFolders/backups.csv
+Expected output:
+
+[ec2-user@ CompanyA]$  echo "25 Aug 25 2019, 16:59, backup.CompanyA.tar gz" | sudo tee SharedFolders/backups.csv
+25 Aug 25 2019, 16:59, backup.CompanyA.tar.gz 
+Note
+
+You may be unfamiliar with the tee command and | redirector, but you will learn about them later. You can use the tee command to write information both in the terminal and in a file.  The | redirector redirects the output of the echo command to the second command, tee, which writes it to both the terminal and the SharedFolders/backups file.
+
+ket:
+command tee buat nulis hasil echonya ke output terminal dan ke dalam file nya. Jadi, kalo kita mau lihat isi SharedFolders/backups.csv pake command cat. 
+
+
+To display the content of the file, enter the following command and press Enter.
+
+[ec2-user@ip-10-0-10-244 CompanyA]$ cat SharedFolders/backups.csv
+Expected output:
+
+[ec2-user@ CompanyA]$ cat SharedFolders/backups.csv
+25 Aug 25 2021, 16:59, backup.CompanyA.tar.gz
+ 
+
+Task 4: Move the backup file
+In this task, you transfer the backup file to the IA folder. In a real-life scenario, you could follow these step to make the file accessible to another user or team that does not have access to the folder where you created the backup file.
+
+To validate that you are in the CompanyA folder in the terminal, enter the following command and press Enter.
+
+pwd
+Expected output:
+
+[ec2-user@ CompanyA]$ pwd
+/home/ec2-user/CompanyA
+To transfer the backup file to the IA team computer, enter the following command and press Enter.
+
+mv ../backup.CompanyA.tar.gz IA/                                   
+To verify that the backup file was moved, enter the following command and press Enter.
+
+ls . IA                                   
+Expected output:
+
+[ec2-user@ CompanyA]$ ls . IA
+.:
+Employees  Finance  HR  IA  Management  SharedFolders
+
+IA:
+backup.CompanyA.tar.gz
+		This commands lists the content of both the current folder, CompanyA, and the IA folder. The b file is not in the current folder anymore and was moved to the IA folder.

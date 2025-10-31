@@ -1,0 +1,17 @@
+# 271025 note
+
+kerjaan devops = harus bisa cloud + linux+ python buat automation + orchestration + CI CD + aws 
+
+lab 261  
+
+masalah nya: user ga bisa internetan ke instance A, tapi bisa internetan ke instance B. yg mana
+
+instance B punya ip publik. instance A ga punya ip publik. 
+
+solusi: kita buat ip publik buat instance A. 
+
+tp gimana caranya ngremote ke instance A? pake teknik -
+kita masuk insstance B dulu baru masuk instance A.
+
+
+
